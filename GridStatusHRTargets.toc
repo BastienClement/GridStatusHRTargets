@@ -6,4 +6,8 @@
 ## Dependencies: Grid
 ## OptionalDeps: LibMapData-1.0
 
+#@no-lib-strip@
+libs\LibMapData-1.0\library.lua
+#@end-no-lib-strip@
+
 GridStatusHRTargets.lua
