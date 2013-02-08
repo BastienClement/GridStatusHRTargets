@@ -34,14 +34,15 @@ local settings
 
 GridStatusHRTargets.defaultDB = {
 	HRTargets = {
-		text      = "HR Target",
-		enable    = false,
-		priority  = 90,
-		frequency = 3,
-		numToFind = 3,
-		color     = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
-		color2    = { r = 1.0, g = 1.0, b = 1.0, a = 0.3 },
-		mst_usage = 0.7
+		text       = "HR Target",
+		enable     = false,
+		priority   = 90,
+		frequency  = 3,
+		numToFind  = 3,
+		color      = { r = 1.0, g = 1.0, b = 1.0, a = 1.0 },
+		color2     = { r = 1.0, g = 1.0, b = 1.0, a = 0.3 },
+		mst_usage  = 0.7,
+		minTargets = 3
 	},
 }
 
@@ -130,6 +131,20 @@ local HRTargets_options = {
 		       end,
 		set  = function(_, v)
 		           GridStatusHRTargets.db.profile.HRTargets.mst_usage = v
+               end
+	},
+	["minTargets"] = {
+		type = "range",
+		name = "Minimum clustered players",
+		desc = "Minimum number of clustered players to be eligible for HR",
+		max  = 10,
+		min  = 1,
+		step = 1,
+		get  = function()
+		           return GridStatusHRTargets.db.profile.HRTargets.minTargets
+		       end,
+		set  = function(_, v)
+		           GridStatusHRTargets.db.profile.HRTargets.minTargets = v
                end
 	},
 }
@@ -320,21 +335,25 @@ function GridStatusHRTargets:GetBestTargets()
 	local mst_usageonus = (GetMasteryEffect() / 100) * settings.mst_usage
 	for i = 1, #roster do
 		local t = roster[i]
-		local p = 0
-		-- Direct healing
-		p = p + (t.healthDeficit > base_healing and base_healing or t.healthDeficit) -- Direct healing
-		p = p + (mst_usageonus * base_healing) -- Direct mastery
-		-- Splash healing
 		local splash_targets = #t.inRange
-		local splash_amount = splash_healing * (splash_targets > 5 and 5 or splash_targets)
-		local splash_per_target = splash_amount / splash_targets
-		for j = 1, splash_targets do
-			local st = t.inRange[j]
-			p = p + (st.healthDeficit > splash_per_target and splash_per_target or st.healthDeficit) -- Direct splash
-			p = p + (mst_usageonus * splash_per_target) -- Splash mastery
+		if splash_targets < settings.minTargets then
+			t.potential = 0
+		else
+			local p = 0
+			-- Direct healing
+			p = p + (t.healthDeficit > base_healing and base_healing or t.healthDeficit) -- Direct healing
+			p = p + (mst_usageonus * base_healing) -- Direct mastery
+			-- Splash healing
+			local splash_amount = splash_healing * (splash_targets > 5 and 5 or splash_targets)
+			local splash_per_target = splash_amount / splash_targets
+			for j = 1, splash_targets do
+				local st = t.inRange[j]
+				p = p + (st.healthDeficit > splash_per_target and splash_per_target or st.healthDeficit) -- Direct splash
+				p = p + (mst_usageonus * splash_per_target) -- Splash mastery
+			end
+			--print(GetUnitName(t.unit) .. " potential is " .. p)
+			t.potential = p
 		end
-		--print(GetUnitName(t.unit) .. " potential is " .. p)
-		t.potential = p
 	end
 	
 	sort(roster, roster_sort)
