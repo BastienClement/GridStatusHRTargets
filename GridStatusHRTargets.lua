@@ -11,6 +11,8 @@ local roster_sort = function(a, b)
 	else
 		if a.potential ~= b.potential then
 			return a.potential > b.potential
+		elseif #a.inRange ~= #b.inRange then
+			return #a.inRange > #b.inRange
 		else
 			return a.unit < b.unit
 		end
