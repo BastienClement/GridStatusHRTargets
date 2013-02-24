@@ -253,13 +253,15 @@ function GridStatusHRTargets:UpdateAllUnits()
 				if roster[i] and UnitIsUnit(roster[i].unit, unitid) then
 					if roster[i].invalid == 0 then
 						local amt = roster[i].potential
-						self.core:SendStatusGained(guid, "HRTargets",
-							settings.priority,
-							40,
-							colors[i],
-							amt > 0 and tostring(math.floor(amt)) or nil
-						)
-						break
+						if amt > 0 then
+							self.core:SendStatusGained(guid, "HRTargets",
+								settings.priority,
+								40,
+								colors[i],
+								amt > 0 and tostring(math.floor(amt)) or nil
+							)
+							break
+						end
 					end
 				end
 				if i == num then
