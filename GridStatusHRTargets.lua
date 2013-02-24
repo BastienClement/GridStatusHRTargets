@@ -338,7 +338,7 @@ function GridStatusHRTargets:GetBestTargets()
 	for i = 1, #roster do
 		local t = roster[i]
 		local splash_targets = #t.inRange
-		if splash_targets < settings.minTargets then
+		if splash_targets < (settings.minTargets - 1) then
 			t.potential = 0
 		else
 			local p = 0
