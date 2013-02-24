@@ -258,7 +258,7 @@ function GridStatusHRTargets:UpdateAllUnits()
 								settings.priority,
 								40,
 								colors[i],
-								amt > 0 and tostring(math.floor(amt)) or nil
+								tostring(math.floor(amt))
 							)
 							break
 						end
