@@ -1,5 +1,9 @@
 local MapDims = LibStub("LibMapData-1.0")
 
+-- LibMapData is a bit slow, and I need this on PTR!
+local MapDimsOverride = {
+}
+
 local raid_units = {}
 for i = 1, MAX_RAID_MEMBERS do
 	raid_units[i] = format("raid%i", i)
@@ -53,8 +57,8 @@ local HRTargets_options = {
 		type = "range",
 		name = "Refresh frequency",
 		desc = "Seconds between status refreshes",
-		get  = function() 
-		           return GridStatusHRTargets.db.profile.HRTargets.frequency 
+		get  = function()
+		           return GridStatusHRTargets.db.profile.HRTargets.frequency
                end,
 		set  = function(_, v)
 		           GridStatusHRTargets.db.profile.HRTargets.frequency = v
@@ -216,8 +220,21 @@ function GridStatusHRTargets:Grid_UnitOffline(event, guid)
 end
 
 function GridStatusHRTargets:MapChanged(event, map, level, w, h)
+	if not WorldMapFrame:IsVisible() then
+		SetMapToCurrentZone()
+		local mapName   = GetMapInfo()
+		local floor     = GetCurrentMapDungeonLevel()
+		local activeMap = MapDimsOverride[mapName]
+		if activeMap then
+			if activeMap[floor] then
+				local activeFloor = activeMap[floor]
+				w = activeFloor[1]
+				h = activeFloor[2]
+			end
+		end
+	end
 	self.data.dimX, self.data.dimY = w, h
-	if not self.data.dimX or self.data.dimX == 0 then 
+	if not self.data.dimX or self.data.dimX == 0 then
 		SetMapToCurrentZone()
 		local map   = GetMapInfo()
 		local level = GetCurrentMapDungeonLevel()
@@ -276,7 +293,7 @@ end
 
 function GridStatusHRTargets:GetBestTargets()
 	if not IsPlayerSpell(82327) then return false end
-	
+
 	-- Update Raid Locations
 	if not self.data.dimX or self.data.dimX == 0 then
 		self:MapChanged()
@@ -286,7 +303,7 @@ function GridStatusHRTargets:GetBestTargets()
 			return false
 		end
 	end
-	
+
 	for i = 1, #roster do
 		local unit = roster[i].unit
 		local x, y
@@ -309,7 +326,7 @@ function GridStatusHRTargets:GetBestTargets()
 		roster[i].inRange = roster[i].inRange or {}
 		wipe(roster[i].inRange)
 	end
-	
+
 	-- Update Distances
 	for i = 1, (#roster - 1) do
 		if roster[i].invalid == 0 then
@@ -319,9 +336,9 @@ function GridStatusHRTargets:GetBestTargets()
 					local x2, y2 = roster[j].location.x, roster[j].location.y
 					local dx = x2 - x1
 					local dy = y2 - y1
-					
+
 					local distance = dx*dx + dy*dy
-					
+
 					-- 100 = 10^2 (radiance range)
 					if distance <= 100 then
 						table.insert(roster[i].inRange, roster[j])
@@ -331,7 +348,7 @@ function GridStatusHRTargets:GetBestTargets()
 			end
 		end
 	end
-	
+
 	-- Compute potential healing
 	-- 5098 to 6230 (+ 67.5% of SpellPower) + 5% SoI + 25% Passive
 	local base_healing = (GetSpellBonusHealing() * 0.675 + 5664) * 1.3125
@@ -359,7 +376,7 @@ function GridStatusHRTargets:GetBestTargets()
 			t.potential = p
 		end
 	end
-	
+
 	sort(roster, roster_sort)
 	return true
 end
