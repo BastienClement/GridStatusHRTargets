@@ -328,6 +328,9 @@ function GridStatusHRTargets:GetBestTargets()
 				if not WorldMapFrame:IsShown() then
 					SetMapToCurrentZone()
 					x, y = GetPlayerMapPosition(unit)
+					if x <= 0 and y <= 0 then
+						roster[i].invalid = 1
+					end
 				end
 			end
 		end
