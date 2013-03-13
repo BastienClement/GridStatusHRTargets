@@ -1,8 +1,6 @@
 ## Interface: 50200
 ## Title: GridStatusHRTargets
 ## Notes: Adds Holy Radiance indicators status to Grid frames.
-## Author: Galedric
-## Version: 1.0
 ## Dependencies: Grid
 ## OptionalDeps: LibMapData-1.0
 
