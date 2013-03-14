@@ -1,7 +1,6 @@
 local MapDims = LibStub("LibMapData-1.0")
-
--- LibMapData is a bit slow, and I need this on PTR!
 local MapDimsOverride = {
+	--[[
 	ThunderKingRaid = {
 		{ 1285, 856.6669921875 },
 		{ 1550.009765625, 1033.33984375 },
@@ -12,6 +11,7 @@ local MapDimsOverride = {
 		{ 810, 540 },
 		{ 617.5, 411.6669921875 },
 	}
+	--]]
 }
 
 local raid_units = {}
