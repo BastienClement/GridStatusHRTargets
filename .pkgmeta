@@ -3,7 +3,3 @@ externals:
 
 required-dependencies:
 	- LibMapData-1.0
-
-ignore:
-	- .git
-	- .gitignore
