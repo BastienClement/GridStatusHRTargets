@@ -33,6 +33,18 @@ local roster_sort = function(a, b)
 	end
 end
 
+local inrange_sort = function(a, b)
+	if a.invalid ~= b.invalid then
+		return a.invalid < b.invalid
+	else
+		if a.healthDeficit ~= b.healthDeficit then
+			return a.healthDeficit > b.healthDeficit
+		else
+			return a.unit < b.unit
+		end
+	end
+end
+
 local GridStatus = Grid:GetModule("GridStatus")
 local GridRoster = Grid:GetModule("GridRoster")
 
@@ -369,7 +381,8 @@ function GridStatusHRTargets:GetBestTargets()
 	local mst_usageonus = (GetMasteryEffect() / 100) * settings.mst_usage
 	for i = 1, #roster do
 		local t = roster[i]
-		local splash_targets = #t.inRange
+		sort(t.inRange, inrange_sort)
+		local splash_targets = #t.inRange > 5 and 5 or #t.inRange
 		if splash_targets < (settings.minTargets - 1) then
 			t.potential = 0
 		else
@@ -378,7 +391,7 @@ function GridStatusHRTargets:GetBestTargets()
 			p = p + (t.healthDeficit > base_healing and base_healing or t.healthDeficit) -- Direct healing
 			p = p + (mst_usageonus * base_healing) -- Direct mastery
 			-- Splash healing
-			local splash_amount = splash_healing * (splash_targets > 5 and 5 or splash_targets)
+			local splash_amount = splash_healing * splash_targets
 			local splash_per_target = splash_amount / splash_targets
 			for j = 1, splash_targets do
 				local st = t.inRange[j]
