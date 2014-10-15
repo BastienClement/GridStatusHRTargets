@@ -1,4 +1,4 @@
-## Interface: 50400
+## Interface: 60000
 ## Title: GridStatusHRTargets
 ## Notes: Adds Holy Radiance indicators status to Grid frames.
 ## Dependencies: Grid
